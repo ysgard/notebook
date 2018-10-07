@@ -49,7 +49,7 @@ let monster_choice = WeightedChoice::new(monster_chances);
   chance of M / M + N + ...
 *** Use the Distribution
 #+BEGIN_SRC rust
-let mut mosnter = match monster_choice.ind_sample(&mut rand::thread_rng()) {
+let mut monster = match monster_choice.ind_sample(&mut rand::thread_rng()) {
     "orc" => {
         // create an orc
     }
