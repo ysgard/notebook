@@ -1,0 +1,56 @@
+#+TITLE: Notes Regarding MySQL/MariaDB
+
+* Connect
+#+BEGIN_SRC bash
+mysql -h <host> -u <user> -p --proto=tcp
+#+END_SRC
+
+* Users
+Unlike PostgreSQL, MySQL maintains a list of users separate from the
+host.
+** Show Users
+#+BEGIN_SRC SQL
+SELECT User, Host FROM mysql.user;
+#+END_SRC
+** Create a User
+#+BEGIN_SRC sql
+CREATE USER '<user>'@'%' IDENTIFIED BY '<password>';
+GRANT ALL ON <database>.* TO '<user>'@'%';
+#+END_SRC
+- This creates a user that can log in from anywhere and has full
+  permissions on ~<database>~.
+
+* Useful Commands
+#+BEGIN_SRC sql
+SHOW DATABASES;
+USE <database>;
+SHOW TABLES;
+DESCRIBE <TABLE>;
+SHOW INDEX IN <TABLE>;
+#+END_SRC
+
+* MySQL Global Info
+This will show you where MySQL is looking for ~my.cnf~, its config file.
+#+BEGIN_SRC bash
+msyqld --help --verbose
+#+END_SRC
+
+And this will show you were MySQL is storing the data:
+#+BEGIN_SRC sql
+SELECT @@datadir;
+#+END_SRC
+
+See & set the value of a MySQL variable:
+#+BEGIN_SRC sql
+SHOW GLOBAL VARIABLES [LIKE "string"];
+SET @@GLOBAL <variable> = <value>;
+#+END_SRC
+
+* Logs
+Logs are disabled by default.  Enable them in ~my.cnf~, or enable them
+on the fly:
+#+BEGIN_SRC sql
+SET GLOBAL general_log = 'ON'; /* <data_dir>/host-name.log */
+SET GLOBAL slow_query_log = 'ON'; /* <data_dir>/host-slow.log */
+#+END_SRC
+Error logging is enabled by default and usually sent to syslog.

@@ -1,0 +1,48 @@
+#+TITLE: Notes About PostgreSQL
+
+* Connect
+#+BEGIN_SRC bash
+psql -h <host> -U postgres
+#+END_SRC
+- Logs in as user ~postgres~
+
+* Users
+
+By default, Postgres uses *ident* for authentication - you log in with
+the OS username and password, so the default password for ~postgres~ is
+the password of the ~postgres~ user account on that host.
+
+* Databases/Schemas
+In PostgreSQL, what we think of a /database/ in MySQL is actually a
+/schema/ - A postgres database is a separate set of files on disk, which
+can have multiple /schemas/, which in turn can have multiple tables.
+
+** Default Databases
+- template0
+- template1
+- postgres
+
+* Console Commands
+- *\?* - help
+- *\l* - list databases
+- *\c <database>* - connect to database
+- *\dn* - list schemas
+- *\dt* - list tables
+- *\di* - list indices
+- *\dg* - list roles
+- *\q* - quit
+
+* Locations
+~show data_directory~ - Where is this database stored?
+~show config_file~ - Where is the config file
+
+* Logs
+- ~show log_destination~ - Usually `stderr`, which is the terminal.
+- ~show logging_collector~ - Are logs being gathered from stderr?
+- ~show log_directory~ - Where to?
+- ~show log_filename~ - In what file?
+
+*** Turn on Logging Until End of Session
+#+BEGIN_SRC SQL
+SELECT set_config('log_statement', 'all', true);
+#+END_SRC

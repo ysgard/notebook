@@ -1,0 +1,49 @@
+#+TITLE: Quick Database Testing
+
+Quickly create databases to experiment with using Docker.
+
+* MySQL/MariaDB
+
+#+BEGIN_SRC bash
+docker run --name test-mysql
+           -e MYSQL_ALLOW_EMPTY_PASSWORD=true
+           -d
+           -p 3306:3306
+           mariadb:latest
+#+END_SRC
+Connect with ~mysql -u root --protocol=tcp~
+
+* PostgreSQL
+
+#+BEGIN_SRC bash
+docker run --name test-psql
+           -e POSTGRES_PASSWORD=''
+           -d
+           -p 5432:5432
+           postgres:latest
+#+END_SRC
+Connect with ~psql -h localhost -U postgres~
+
+* Cassandra
+#+BEGIN_SRC bash
+docker run --name test-cassandra
+           -d
+           -p 9042:9042
+           cassandra:latest
+#+END_SRC
+Connect with ~cqlsh 127.0.0.1 9042~
+
+* Redis
+#+BEGIN_SRC bash
+docker run --name test-redis
+           -d
+           -p 6379:6379
+           redis:latest
+#+END_SRC
+Connect with ~redis-cli~
+
+* Create a Random File of ASCII
+#+BEGIN_SRC bash
+base64 /dev/urandom | head -C 100M > file100Mb.txt
+#+END_SRC
+Use ~G~ for gigabytes and ~K~ for kilobytes.
