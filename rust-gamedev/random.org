@@ -3,6 +3,9 @@
 * Produce a Result in a Range
 - Example: 3d6
 #+BEGIN_SRC rust
+extern crate rand;
+use rand::Rng;
+
 let mut total = 0;
 for _ in 0..3 {
     total += rand::thread_rng().gen_range(0,7);
