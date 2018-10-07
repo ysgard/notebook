@@ -1,0 +1,116 @@
+#+TITLE: Notes About Rust RNG
+
+* Produce a Result in a Range
+- Example: 3d6
+#+BEGIN_SRC rust
+let mut total = 0;
+for _ in 0..3 {
+    total += rand::thread_rng().gen_range(0,7);
+}
+#+END_SRC
+- Possibly a better way is to use an iterator chain.
+
+
+* Weighted Distribution
+- from https://tomassedovic.github.io/roguelike-tutorial/part-12-monster-item-progression.html
+** Why use?
+- Irritating to have one long lool like:
+  #+BEGIN_SRC rust
+  let dice = rand::random::<f32>();
+  let mut item = if dice < 0.7 {
+     // (70% of this)
+  } else if dice < 0.7 + 0.1 {
+     // (10% of this)
+  } else {
+     // (20% of this)
+  };
+  #+END_SRC
+- Easy to make mistakes, cumbersome to maintain
+
+** Enter: Weighted Distribution
+- Allows us to define 'loot tables'
+*** Requirement
+#+BEGIN_SRC rust
+use rand::distributions::{Weighted, WeightedChoice, IndependentSample};
+#+END_SRC
+*** Define Distribution
+#+BEGIN_SRC rust
+let monster_chances = &mut [
+Weighted { weight: 80, item: "orc"},
+Weighted { weight: 20, item: "troll" },
+];
+let monster_choice = WeightedChoice::new(monster_chances);
+#+END_SRC
+- Note that the numbers don't have to add up to 100, or even represent
+  fractions of 1.  They can be anything, they just represent the
+  chance of M / M + N + ...
+*** Use the Distribution
+#+BEGIN_SRC rust
+let mut mosnter = match monster_choice.ind_sample(&mut rand::thread_rng()) {
+    "orc" => {
+        // create an orc
+    }
+    "troll" => {
+        // create a troll
+    }
+    _ => unreachable!()
+};
+#+END_SRC
+**  More: Distributions That Depend On Other Factors
+- What if the distribution needs to change depending on some other
+  factor?
+- Typical example is a dungeon monster table - the chance to find a
+  specific monster on a level of the dungeon is a function of the
+  dungeon level.
+- You could have a separate monster table for each level, but it's
+  possible to have a single table for all monsters and determine the
+  distribution based on level.
+*** Define a Transition Struct
+#+BEGIN_SRC rust
+struct Transition {
+    level: u32,
+    value: u32,
+}
+#+END_SRC
+- This defines the probability distribution for the given level.
+*** Get the Correct Value for a Given Level
+- To return a value that depends on level, we'll use a function like this:
+#+BEGIN_SRC rust
+fn from_dungeon_level(table: &[Transition], level: u32) -> u32 {
+table.iter()
+    .rev()
+    .find(|transition| level >= transition.level)
+    .map_or(0, |transition| transition.value)
+}
+#+END_SRC
+- Reminder: ~map_or~ applies a function to the contained value (if any)
+  or returns the provided default (0 in this case).
+- The rev() here searches the table from the bottom up, so it will
+  return the first transition that corresponds to ~level >=
+  transition.level~
+*** Using a Transition Table
+- Using a Transition struct and the function to search the table, we
+  can now define tables like so:
+#+BEGIN_SRC rust
+let max_monsters = from_dungeon_level(&[
+    Transition { level: 1, value: 2 },
+    Transition { level: 4, value: 3 },
+    Transition { level: 6, value: 5 },
+], level);
+// Choose random number of monsters
+let num_monsters = rand::thread_rng().gen_range(0, max_monsters + 1);
+#+END_SRC
+- Now for a monster table example:
+#+BEGIN_SRC rust
+let troll_chance = from_dungeon_level(&[
+    Transition {level: 3, value: 15},
+    Transition {level: 5, value: 30},
+    Transition {level: 7, value: 60},
+], level);
+
+let monster_chances = &mut [
+    Weighted {weight: 80, item: "orc"},
+    Weighted {weight: troll_chance, item: "troll"},
+    ...
+];
+#+END_SRC
