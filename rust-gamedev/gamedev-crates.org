@@ -2,29 +2,29 @@
 
 * Suggested Crates for Rust Game Development
 
-*clippy* - Rust linter
+- *clippy* - Rust linter
 
-*lazy_static* - declare lazily evaluated statics
-*log* - lightweight logging facade
-*rand* - RNG goodness
-*num* - collection of numeric types (bigint, complex, etc...)
-*smallvec* - small vector optimization - store small vecs on the stack
-*serde (+json +yaml)* - generic serialization lib
-*strum* - macros for working with enums & strings
-*rental* - macro to generate self-referential structs
-*regex* - improved & performant regex matching
-*backtrace* - acquire a stack trace at runtime
-*itertools* - extra iterator adaptor, methods, funcs and macros
-*error-chaing* - error boilerplate library
-*sdl2* - what the tin says
-*gl* - low-level OpenGL bindings
-*png* - PNG encoding/decoding
-*ogg-sys* - FFI for libogg, a free sound format
-*vorbis-sys* - FFI for libvorbis, a free video format
-*vorbisfile-sys* - FFI for vorbisfile
-*twox-hash* - Rust implementation of XXHash algo
-*rlua* - high-level bindings to Lua
-*bitflags* - macros to generate structs that act like bitflags
-*cc* - cargo build script helper to compile C into FFI
-*cfg-if* - define an item depending on #[cfg]
-*deflate* - DEFLATE, zlib and gzip encoder
+- *lazy_static* - declare lazily evaluated statics
+- *log* - lightweight logging facade
+- *rand* - RNG goodness
+- *num* - collection of numeric types (bigint, complex, etc...)
+- *smallvec* - small vector optimization - store small vecs on the stack
+- *serde (+json +yaml)* - generic serialization lib
+- *strum* - macros for working with enums & strings
+- *rental* - macro to generate self-referential structs
+- *regex* - improved & performant regex matching
+- *backtrace* - acquire a stack trace at runtime
+- *itertools* - extra iterator adaptor, methods, funcs and macros
+- *error-chaing* - error boilerplate library
+- *sdl2* - what the tin says
+- *gl* - low-level OpenGL bindings
+- *png* - PNG encoding/decoding
+- *ogg-sys* - FFI for libogg, a free sound format
+- *vorbis-sys* - FFI for libvorbis, a free video format
+- *vorbisfile-sys* - FFI for vorbisfile
+- *twox-hash* - Rust implementation of XXHash algo
+- *rlua* - high-level bindings to Lua
+- *bitflags* - macros to generate structs that act like bitflags
+- *cc* - cargo build script helper to compile C into FFI
+- *cfg-if* - define an item depending on #[cfg]
+- *deflate* - DEFLATE, zlib and gzip encoder
