@@ -1,0 +1,59 @@
+#+TITLE: CQLSH Notes
+
+CQLSH is a pain to install, it requires python 2 (no python 3 version)
+and thus is a headache.  Worse, some versions won't connect to
+Cassandra 3 but are required for Cassandra 2, so if you find yourself
+needing both versions you need ~virtualenv~ to manage them.
+
+*Solution:* Use Docker to host and run the version of CQLSH that you
+need.
+
+* Cassandra 3
+** Build
+#+BEGIN_SRC bash
+docker build -t cqlsh3 -f Dockerfile.v3 .
+#+END_SRC
+** Usage
+Probably best to create the following alias:
+#+BEGIN_SRC bash
+alias cqlsh3="docker run -it --rm cqlsh3"
+#+END_SRC
+** Dockerfile.v3
+#+BEGIN_SRC Dockerfile
+FROM alpine
+
+MAINTAINER tech_ops@change.org
+
+RUN apk update && \
+    apk add python2 py2-pip curl --no-cache
+
+ENV CQLSH_VERSION 5.0.4
+RUN pip install cqlsh==5.0.4
+
+ENTRYPOINT ["cqlsh", "--cqlversion=3.4.4"]
+#+END_SRC
+
+* Cassandra 2
+** Build
+#+BEGIN_SRC bash
+docker build -t cqlsh2 -f Dockerfile.v2 .
+#+END_SRC
+** Usage
+#+BEGIN_SRC bash
+alias cqlsh2="docker run -it --rm cqlsh2"
+#+END_SRC
+** Dockerfile.v2
+#+BEGIN_SRC bash
+FROM alpine
+
+MAINTAINER tech_ops@change.org
+
+RUN apk update && \
+    apk add python2 curl --purge
+
+RUN curl -O http://apache.forsale.plus/cassandra/2.1.20/apache-cassandra-2.1.20-bin.tar.gz \
+    && tar zxvf apache-cassandra-2.1.20-bin.tar.gz \
+    && rm apache-cassandra-2.1.20-bin.tar.gz
+
+ENTRYPOINT ["/apache-cassandra-2.1.20/bin/cqlsh"]
+#+END_SRC
