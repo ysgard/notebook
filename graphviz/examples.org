@@ -1,0 +1,17 @@
+* Makefile dependency tree
+#+BEGIN_SRC dot :file makefile-deptree.png :cmdline -Kdot -Tpng
+digraph {
+go [label="graphics.o"]
+gc [label="graphics.c"]
+po [label="physics.o"]
+pc [label="physics.c"]
+io [label="input.o"]
+ic [label="input.c"]
+game -> { go po io }
+go -> gc
+po -> pc
+io -> ic
+{ rank=same; go, po, io }
+{ rank=same; gc, pc, ic }
+}
+#+END_SRC

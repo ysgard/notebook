@@ -1,0 +1,15 @@
+#+TITLE: General Notes About Docker
+
+* Commands
+** Images Present
+#+BEGIN_SRC bash
+docker images
+#+END_SRC
+** See layers of an existing images
+#+BEGIN_SRC bash
+docker history <image id>
+#+END_SRC
+** Logs of Running Containers
+#+BEGIN_SRC docker
+docker logs <container id>
+#+END_SRC

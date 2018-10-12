@@ -1,0 +1,39 @@
+#+TITLE: Graphviz Inside Emacs
+
+Can use graphviz inside emacs to translate dot syntax into pngs.
+
+To make this work, you need *org-babel* (which is included in Emacs 25).
+You will also need to install *graphviz* and make sure that *dot* is in
+the PATH.
+
+Enable the /dot/ format with the following /elisp/:
+#+BEGIN_SRC lisp
+(org-babel-do-load-languages 'org-babel-load-languages
+  '((dot . t)))
+#+END_SRC
+
+Then in your ORG file specify dot syntax like so:
+#+BEGIN_SRC dot :file dot_success.png :cmdline -Kdot -Tpng
+digraph {
+// graph from left to right
+rankdir=LR;
+splines=true;
+node [shape=box];
+
+id [label="Install Graphvix"]
+conf [label="Configure org-babel"]
+dot [label="DOT in org-mode"]
+
+id -> conf
+conf -> dot
+dot -> "Profit"
+dot -> "Success" [style=dotted]
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:dot_success.png]]
+
+The with the cursor inside the block, press ~C-c C-c~ to evaluate the
+code.  Emacs will create the file /dot_success.png/ and put the link in
+a ~#+RESULTS~ section.

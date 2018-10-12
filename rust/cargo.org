@@ -1,0 +1,29 @@
+#+TITLE: Notes about Cargo
+
+* Dependencies
+Use ~crate = "<version>"~
+This uses semantic versioning, so if you want a crate greater than or
+equal to '0.31', you would use:
+#+BEGIN_SRC yaml
+sdl2 = ">= 0.31.0"
+#+END_SRC
+
+* Specifying Crate Features
+Features for crates can be specified in one of two ways:
+** Method 1
+#+BEGIN_SRC yaml
+[dependencies]
+sdl2 = { version = "0.31.0", features = ["bundled", "static-link"] }
+#+END_SRC
+** Method 2
+#+BEGIN_SRC yaml
+[dependencies.sdl2]
+version = "0.31.0"
+features = ["bundled", "static-link"]
+#+END_SRC
+* Creating documentation
+Cargo can automatically generate and open documentation for any crate
+the project depends on:
+#+BEGIN_SRC bash
+cargo doc -p <package> --no-deps --open
+#+END_SRC

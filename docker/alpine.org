@@ -1,0 +1,11 @@
+#+TITLE: Notes About Alpine
+
+* No libc, only musl
+- This can affect things like networking
+- https://www.musl-libc.org/
+
+* APK (Package Manager)
+- Keep containers lightweight by not using caching
+  #+BEGIN_SRC sh
+  apk add --no-cache mysql-client
+  #+END_SRC

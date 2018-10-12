@@ -1,0 +1,106 @@
+#+TITLE: Notes About Make
+
+[[file:makefile-deptree.png]]
+- Makefile dependency tree
+- Tree roots are the final product(s).
+- Vertices are /targets/.
+- Edges are /rules/
+
+** Targets
+#+BEGIN_SRC make
+Targets: target [target..]: [prerequisite]
+#+END_SRC
+- While multiple targets can be specified with a single rule, this is
+  unusual.
+- 6 special targets for Makefile, defined by the language itself.
+- Target rules need to be indented with a tab.  Not spaces, an actual
+  tab, or the makefile will fail.
+
+** Special Rules
+*** .POSIX
+- Enforce POSIX standards
+*** .SUFFIXES
+- When blank, erases all built-in inference rules
+- When not blank, defines that inference rules will be used for the
+  given targets.
+*** .PHONY
+- Defines Makefile targets that are unrelated to files, for example,
+  /all/, /clean/, /install/, /distclean/, /TAGS/, /info/, /help/, etc...
+#+BEGIN_SRC makefile
+.PHONY: clean install
+#+END_SRC
+
+** Inference Rules
+- Make comes with a bunch of built-in rules defining how to build
+  specific targets.  For example, it know that <name>.o files are
+  built from a combination of <name>.c and <name>.h files.
+- This can be troublesome, so can erase built-in inference rules with *.SUFFIXES*
+- ~$<~ is a special variable that will expand to the target in a rule
+
+** Simple Example
+#+BEGIN_SRC makefile
+.POSIX # enforce POSIX standards
+.SUFFIXES # Erase all built-in inference rules
+CC = cc # Macro.  This and the following definitions can be overridden
+CFLAGS = -W -O  # on the command line with: make CC=clang CFLAGS='-O3'
+LDLIBS = -lm
+
+all: game # default target, can use 'make -e' to get from ENV instead
+
+game: graphics.o physics.o input.o
+    $(CC) $(LDFLAGS) -o game graphics.o physics.o input.o $(LDLIBS)
+
+graphics.o: graphics.c graphics.h # include .h files to force rebuild if they change
+    $(CC) -c $(CFLAGS) graphics.c
+
+physics.o: physics.c physics.h
+    $(CC) -c $(CFLAGS) physics.c
+
+input.o: input.c input.h
+    $(CC) -c $(CFLAGS) input.c
+
+clean:
+    rm -f game graphics.o physics.o input.o
+
+#+END_SRC
+
+** Better Example using Inferred Rules
+- This is long and a bit repetitive, so can define inference rules to
+  reduce it, like so:
+#+BEGIN_SRC makefile
+.POSIX
+.SUFFIXES
+CC = cc
+CFLAGS = -W -O
+LDLIBS = -lm
+
+all: game
+game: graphics.o physics.o input.o
+    $(CC) $(LDFLAGS) -o game graphics.o physics.o input.o $(LDLIBS)
+graphics.o: graphics.c graphics.h
+physics.o: physics.c physics.h
+input.o: input.c input.h
+clean:
+    rm -f game graphics.o physics.o input.o
+.SUFFIXES: .c .o # We override the above empty SUFFIXES to say we want inference for .c and .o files
+.c.o: # Define the building of a .o file from a .c file
+    $(CC) $(CFLAGS) -c $<
+#+END_SRC
+
+** Self-documenting Makefiles
+- Use ~make help~ to spit out what each target does.
+- To do this, set up the Makefile as follows:
+#+BEGIN_SRC makefile
+.PHONY: help
+help:
+    @awk 'BEGIN {FS=":.*?## "} /^[a-zA-Z_-]+:.*?##/ {printf "\033[36m%-30s\033[0m %s\n", $$1,$$2}' $(MAKEFILE_LIST)
+
+.DEFAULT_GOAL := help
+
+# Then put a '## comment...' after each target, like so:
+install-dev: install ## Install dependencies and...
+    ...
+
+stop-frontend-dev: webpack PID ## Stop the frontend web dev...
+    ...
+#+END_SRC

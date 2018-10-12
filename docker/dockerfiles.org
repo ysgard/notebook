@@ -1,0 +1,19 @@
+#+TITLE: Dockerfile Notes
+
+* General Principles
+- Docker images are tarballs containing union FS layers.
+- When transferring images, only the new/changed layers are
+  transferred.
+- A changed layer invalidates all the layers that come after, so try
+  to place frequently changed layers near the bottom of a Dockerfile.
+- Each docker instructions creates a new layer, so minimize the amount
+  of docker instructions by maximizing what each docker instruction
+  does.
+- Always specify a version when installing either software or pulling
+  from a base image.  This will make things predictable and help proof
+  against missing versions, backwards compatibility issues, etc...
+- Never include sensitive data in a Docker image.  If a container
+  needs sensitive information, pass it in using environment variables
+  or by mounting a volume with the sensitive data in it.
+- Don't use *CMD* or *ENTRYPOINT* as the root user.  Preface it with a
+  *USER* directive to run it as a non-privileged user, if possible.
