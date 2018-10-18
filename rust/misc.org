@@ -1,0 +1,50 @@
+#+TITLE: Miscellaneous Assorted Tidbits
+
+Stuff here will likely get classified somewhere else as soon as it
+accumulates enough material for the given subject.
+
+* Environment
+** Get the current exe
+#+BEGIN_SRC rust
+pub enum Error {
+    FailedToGetExePath,
+}
+// code, code, code...
+let exe_file_name = ::std::env::current_exe().map_err(|_| Error::FailedToGetExePath)?;
+#+END_SRC
+
+* Paths
+** Handy function to turn a relative path to an absolute one
+- Using the location of the EXE as the current dir
+  #+BEGIN_SRC rust
+  pub enum Error {
+      FailedToGetExePath,
+      FailedToGetCurrentPath,
+  }
+  pub fn absolute_from_relative(relative_path: &Path) -> Result<PathBuf, Error> {
+      let current_loc = ::std::env::current_exe().map_err(|_| Error::FailedToGetExePath)?;
+      let current_path = current_loc.parent().ok_or(Error::FailedToGetCurrentPath)?;
+      Ok(current_path.join(relative_path))
+  }
+  #+END_SRC
+
+* Use
+** Use module and sub-module(s) with one line
+Instead of this:
+#+BEGIN_SRC rust
+use std::io;
+use std::io::Read;
+#+END_SRC
+Do this:
+#+BEGIN_SRC rust
+use std::{self, Read};
+#+END_SRC
+
+* Files
+** Read a file into a buffer of bytes
+#+BEGIN_SRC rust
+let mut file = ::std::fs::File::open(::std::path::Path::new("./foo/bar.blob")).unwrap();
+// Allocate buffer to be the same size of the file
+let mut buffer: Vec<u8> = Vec::with_capacity(file.metadata().unwrap().len() as usize + 1);
+file.read_to_end(&mut buffer).unwrap();
+#+END_SRC

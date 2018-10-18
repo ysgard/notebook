@@ -1,0 +1,23 @@
+#+TITLE: Notes About Rust Error Handling
+
+
+
+* Result
+** ?
+- This operator, when used inside a function on another functions that
+  returns a ~Result~ type, unwraps the ~Ok~ result or exits from the
+  function with an ~Err~.
+- ~?~ can only exit from a function if the return types match.
+** Use map_err to map a Result<T,E> to a Result<T,F>
+- Uses the supplied function to map ~Err~ values to something else,
+  leaving ~Ok~ values untouched
+- Good use is to map errors to enums, for example:
+  #+BEGIN_SRC rust
+  pub enum Error {
+      //...
+      FailedToGetExePath,
+      //...
+  }
+  // code...
+  let exe_file_name = ::std::env::current_exe().map_err(|_| Error::FailedToGetExePath)?;
+  #+END_SRC

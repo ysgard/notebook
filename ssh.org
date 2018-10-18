@@ -1,0 +1,12 @@
+#+TITLE: SSH Notes
+
+* Running Commands using SSH
+** Running a command in a fire-and-forget screen session
+You can run commands inside a detached screen session that will
+terminate when the command does.  This is good for firing off
+long-running processes (like repairs on a cassandra node) using a tool
+like ~knife ssh~.
+- This example will run a ~dd~ command insided such a session.
+#+BEGIN_SRC bash
+ssh 10.200.10.200 'sudo screen -dm -S shared dd if=/dev/urandom of=/tmp/randblock bs=1K count=100'
+#+END_SRC
