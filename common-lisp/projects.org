@@ -1,0 +1,132 @@
+#+TITLE: Projects
+
+Use *Quicklisp* to manage projects.  It's a library that sits atop *ASDF*.
+
+* Glossary
+** Package
+A container for symbols.  This is essentially a namespace so you don't
+have to prefix all your names with ~my-library-...~
+** System
+- A collection of code and a description of how to load that code.
+  Systems usually live in the ~<project>.asd~ file in your project dir.
+*- ASDF* is the Common Lisp library that handles the loading and
+   unloading of systems. It comes bundled with the most common CL
+   implementations.
+- Systems and packages are orthogonal.  Systems can define one or more
+  than one packages, or they may define no packages but use existing
+  ones.
+** Projects
+- Doesn't have an official definition?  But...
+- Common Lisp knows about files and packages.  ASDF adds systems.
+  Quicklisp adds the internet.
+
+* Quicklisp Projects
+** Location
+- I install Quicklisp to ~${HOME}/quicklisp~
+- Quicklisp expects all projects to live in
+  #+BEGIN_SRC sh
+  ${HOME}/quicklisp/local-projects
+  #+END_SRC
+- *However*, a symlink in that directory to your project dir is fine.
+- Alias to create such a link inside a project dir:
+  #+BEGIN_SRC sh
+  alias llp='ln -s "$(pwd)" "$HOME/.quicklisp/local-projects"
+  #+END_SRC
+
+** .asd files
+- ...are how Quicklisp(ASDF) projects are defined.  Sample asd file:
+#+BEGIN_SRC lisp
+(asdf:defsystem lysk
+  :description "Lykan Game Client"
+  :author "lthms"
+  :licence "GPLv3"
+  :serial t
+  :depends-on (trivial-gamekit)
+  :components ((:file "package")
+               (:file "lysk")))
+#+END_SRC
+- The ~serial t~ means that files defined in ~components~ depend on the
+  files above them.  So ~lysk.lisp~ will depend on ~package.lisp~.
+- You can specify package dependencies manually like so:
+  #+BEGIN_SRC lisp
+  (:file "seconds" :depends-on "first")
+  #+END_SRC
+
+** package.lisp
+- This is where we define our package(s).  Example:
+#+BEGIN_SRC lisp
+(defpackage :lysk
+  (:use :cl)
+  (:export run app))
+#+END_SRC
+- This exports two symbols, ~run~ and ~app~.
+
+** .lisp files
+- Complete example:
+#+BEGIN_SRC lisp
+(cl:in-package :lysk)
+
+(gamekit:defgame app () ()
+                 (:fullscreen-p 't))
+
+(defmethod gamekit:post-initialize ((app app))
+  (gamekit:bind-button :mouse-left :released
+                       (lambda () (gamekit:stop))))
+
+(defun run ()
+  (gamekit:start 'app))
+#+END_SRC
+
+** Running the program
+- Now you can run the program with:
+  #+BEGIN_SRC sh
+  $ ccl
+  ? (ql:quickload :lysk)
+  ? (lysk:run)
+  #+END_SRC
+
+** Sample Makefile for handling the above
+#+BEGIN_SRC makefile
+run:
+        @sbcl --eval "(ql:quickload :lysk)" \
+              --eval "(lysk:run)"
+
+bundle:
+        @echo -en "[ ] Remove old build"
+        @rm -rf build/
+        @echo -e "\r[*] Remove old build"
+        @echo "[ ] Building"
+        @sbcl --eval "(ql:quickload :lysk/bundle)" --eval "(lysk.bundle:deliver)" --quit
+        @echo "[*] Building"
+
+.PHONY: bundle run
+#+END_SRC
+
+* Standalone Executable (using Gamekit)
+
+- In the .asd file, define a second system:
+  #+BEGIN_SRC lisp
+  (asdf:defsystem lysk/bundle
+    :description "Bundle to Lykan game client"
+    :author "lthms"
+    :license "GPLv3"
+    :version "0.0.1"
+    :serial t
+    :depends-on (trivial-gamekit/distribution lysk)
+    :components ((:file "bundle")))
+  #+END_SRC
+- Then, in ~bundle.lisp~:
+  #+BEGIN_SRC lisp
+  (cl:defpackage :lysk.bundle
+    (:use :cl)
+    (:export deliver))
+
+  (cl:in-package :lysk.bundle)
+
+  (defun deliver ()
+    (gamekit.distribution:deliver :lysk 'lysk:app))
+  #+END_SRC
+- Then you can bundle at anytime using:
+  #+BEGIN_SRC sh
+  ccl -e "(ql:quickload :lysk/bundle)" -e "(lysk.bundle:deliver)" -e "(quit)"
+  #+END_SRC

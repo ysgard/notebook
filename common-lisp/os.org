@@ -1,0 +1,6 @@
+#+TITLE: OS and System Notes
+
+* Running an external process in Clozure
+#+BEGIN_SRC lisp
+(ccl:run-program "/usr/local/bin/dot" (list "-Tpng" "-O" fname))
+#+END_SRC

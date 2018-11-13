@@ -1,0 +1,27 @@
+#+TITLE: Chef Notes
+
+
+* Using parseconfig in serverspec tests to check .cfg files
+- In ~test/integration/default/serverspec/Gemfile~
+#+BEGIN_SRC ruby
+source 'http://rubygems.org'
+
+gem 'parseconfig', require: false
+#+END_SRC
+- Then in the serverspec test
+#+BEGIN_SRC ruby
+require_relative 'spec_helper'
+require 'parseconfig'
+
+describe 'some_file.cfg' do
+  ...
+  describe 'the_config' do
+    subject { ParseConfig.new('/path/to/some_file.cfg') }
+
+    it 'does something something' do
+      expect(subject['top_level']['some_key']).to_eql('some_value')
+    end
+    ...etc...
+  end
+end
+#+END_SRC

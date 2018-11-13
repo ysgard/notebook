@@ -1,0 +1,97 @@
+#+TITLE: Terraform Setup and Basic Example
+
+Terraform is a single large, statically linked binary that you can
+place anywhere.  It is ~110Mb in size.
+
+#+BEGIN_SRC bash
+➜  bin terraform --version
+Terraform v0.11.10
+#+END_SRC
+
+* Terraform files
+- Written in ~HCL~ (Hashicorp Configuration Language
+- ~.tf~ extensions
+
+* Sample Terraform File
+
+#+BEGIN_SRC terraform
+variable "name_length" {
+  type = "string"
+  default = "2"
+  description = "The number of words to put into the random name"
+}
+#+END_SRC
+
+* Code Org
+
+- Terraform looks in the current directory (or a specified directory)
+and will find all *.tf files.
+- *Terraform ignores subdirectories*
+- When compiling files, terraform builds a graph of resources
+- ~variables~ and ~outputs~ often put in separate files to make it easier
+  to find
+- code often factored into modules
+
+
+* terraform init
+
+- Run this in directory to initialize terraform
+- Looks at providers, downloads necessary plugins, etc...
+- provider plugins stored in ~.terraform/~
+- state stored in ~terraform.tfstate~
+
+* Workflow overview
+#+BEGIN_SRC dot :file terraform-workflow-overview.png :cmdline -Kdot -Tpng
+digraph {
+rankdir="LR";
+code -> plan;
+plan -> apply;
+apply -> commit;
+}
+#+END_SRC
+
+#+RESULTS:
+[[file:terraform-workflow-overview.png]]
+
+
+* terraform plan
+
+- Run this to preview planned changes
+- Good for telling if something is going to be updated or destroyed &
+  re-created
+- Items with a *+* will be created
+- Items with a *-/+* will be destroyed and then created
+- output the plan to guarantee that what gets output is what gets
+  applied
+- ~terraform plan -out "plan-$(date +%s)"~
+
+* terraform apply <plan>
+
+- Apply the given plan
+- ~terraform apply plan-1541794806.out~
+- Any outputs
+
+* Variables
+
+- Can pass in different values for each variable by using ~-var~
+- Example: ~terraform plan -var name_length=3~
+- plans with vars /must/ be saved to a plan file.
+
+* terraform graph
+
+- Creates a DOT file for your dependencies
+- Pipe into graphviz to produce a neat graph
+- ~terraform graph | dot -Tpng -o tfdemo.png~
+
+* terraform state
+- Stored in terraform.tfstate
+- State files are stored in JSON
+- Represents Terraform's current view of defined resources
+- Run ~terraform plan~ in a dir where ~apply~ was previously done, and
+  terraform will say there's nothing to be done.
+- State should be persisted in source control, or managed by a
+  backend.
+- Default backend is 'local', i.e. file is managed locally
+- Other backends can be found here:
+  https://www.terraform.io/docs/backends/types/index.html
+- Of particular interest: etcd, etcdv3, s3 and consul.

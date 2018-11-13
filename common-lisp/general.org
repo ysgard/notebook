@@ -1,0 +1,17 @@
+#+TITLE: Miscellaneous Notes about Lisp
+
+* EQUAL vs EQ
+- Use EQ for symbols.  Use EQUAL for everything else.
+
+* Local Variables and Functions
+** let
+- define local variables
+- parallel definition
+** let*
+- define local variables that depend on earlier defined local
+  variables
+- sequential definitions
+** flet
+- define local functions
+** labels
+- define local functions that depend on other local functions

@@ -1,0 +1,23 @@
+#+TITLE: File Operations
+
+
+* Write something to a file
+#+BEGIN_SRC lisp
+(with-open-file (my-stream
+                 "testfile.txt"
+                 :direction :output
+                 :if-exists :supersede)
+    (princ "Hello file!" my-stream))
+#+END_SRC
+
+* Redirect stdout to a file temporarily
+#+BEGIN_SRC lisp
+(with-open-file (*standard-output*
+                 fname
+                 :direction :output
+                 :if-exists :supersede)
+    (funcall thunk))
+#+END_SRC
+- This temporarily binds the stdout stream to the file defined in
+  *fname*, then calls a function passed in named /thunk/.  Any printing
+  /thunk/ does to stdout will instead be sent to the file *fname*.
